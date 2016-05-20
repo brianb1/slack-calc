@@ -1,7 +1,6 @@
 // slack-calc
 // by James Vaughan
 
-
 // Setup the canvas
 const canvas = document.getElementById("canvas");
 const ctx = canvas.getContext("2d");
@@ -11,7 +10,6 @@ function resize() {
 }
 resize();
 onresize = resize;
-
 
 // Display the tension
 const lengthInput = document.getElementById("length");
@@ -27,10 +25,29 @@ function updateTension() {
     / (2 * sag));
 }
 updateTension();
-lengthInput.oninput = updateTension;
-sagInput.onkeydown = updateTension;
-weightInput.onkeydown = updateTension;
 
+// Make the input scrubbable
+// inspired by Nicky Case (ncase.me) and his Matrix visualizer
+let scrubbing = null;
+let scrubPosition = 0;
+let scrubStartValue = 0;
+Array.from(document.querySelectorAll("input")).forEach(input => {
+	input.oninput = updateTension;
+	input.onmousedown = e => {
+		scrubbing = e.target;
+		scrubPosition = e.clientX;
+		scrubStartValue = parseFloat(input.value);
+	}
+});
+onmousemove = e => {
+	if (scrubbing) {
+		scrubbing.blur();
+		let delta = Math.round((e.clientX - scrubPosition) / 5);
+		scrubbing.value = Math.floor(scrubStartValue + delta);
+		updateTension();
+	}
+};
+onmouseup = () => scrubbing = null;
 
 // Draw the scene
 ctx.fillCircle = function (x, y, radius) {
@@ -40,23 +57,23 @@ ctx.fillCircle = function (x, y, radius) {
 };
 
 ctx.fillCloud = function (x, y, s) {
-  ctx.beginPath()
-	ctx.arc(x, y, 10 * s, Math.PI / 2, 3 * Math.PI / 2);
-	ctx.arc(x + 20 * s, y - 10 * s, 20 * s, Math.PI, 9 * Math.PI / 5);
-	ctx.arc(x + 40 * s, y - 7.5 * s, 15 * s, 7 * Math.PI / 5, 0);
-  ctx.arc(x + 55 * s, y, 10 * s, 3 * Math.PI / 2, Math.PI / 2);
-	ctx.closePath();
-  ctx.fill();
+  this.beginPath()
+  this.arc(x, y, 10 * s, Math.PI / 2, 3 * Math.PI / 2);
+  this.arc(x + 20 * s, y - 10 * s, 20 * s, Math.PI, 9 * Math.PI / 5);
+  this.arc(x + 40 * s, y - 7.5 * s, 15 * s, 7 * Math.PI / 5, 0);
+  this.arc(x + 55 * s, y, 10 * s, 3 * Math.PI / 2, Math.PI / 2);
+  this.closePath();
+  this.fill();
 };
 
 function draw(timestamp) {
-	let lineLength = parseInt(document.getElementById("length").value);
-	let lineSag = parseInt(document.getElementById("sag").value);
-	lineLength = lineLength < 10 ? 10 : lineLength > 300 ? 300 : lineLength || 50;
+	let lineSag = parseInt(sagInput.value);
 	lineSag = lineSag < 1 ? 1 : lineSag > 10 ? 10 : lineSag || 1;
+	let lineLength = parseInt(lengthInput.value);
+	lineLength = lineLength < 10 ? 10
+		: lineLength > 300 ? 300
+		: lineLength || 50;
   let length = (lineLength - 10) / (290);
-  let sag = (lineSag - 10) / (290);
-	//lineSag = 1 + (9 * (1 + Math.cos(timestamp / 100)) / 2);
 
   // clear the canvas
   ctx.clearRect(0, 0, canvas.width, canvas.height);
@@ -74,9 +91,8 @@ function draw(timestamp) {
 	let cloudPosition = function (speed, start) {
 		return ((speed * (timestamp / 20) + start) % (canvas.width + 550)) - 400;
 	}
-
   ctx.fillStyle = "ghostwhite";
-  ctx.fillCloud(300, 200, 2);
+  ctx.fillCloud(cloudPosition(1.2, 1000), 200, 2);
   ctx.fillCloud(cloudPosition(0.2, 0), 200, 0.2);
   ctx.fillCloud(cloudPosition(0.2, 700), 200, 0.2);
   ctx.fillCloud(cloudPosition(0.5, 200), 100, 0.5);
