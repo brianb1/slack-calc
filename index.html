@@ -4,7 +4,7 @@
   <meta charset="utf-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1">
 
-  <title></title>
+  <title>slack-calc</title>
   <meta name="description" content="">
   <meta name="author" content="James Vaughan">
 
@@ -12,6 +12,26 @@
 </head>
 
 <body>
+	<canvas id="canvas"></canvas>
+	<section>
+		<div id="controls">
+			<div>
+				<input value="100" id="length"></input>
+				<label>Line Length</label>
+			</div>
+			<div>
+				<input value="5" id="sag"></input>
+				<label>Sag w/ Slacker in Center</label>
+			</div>
+			<div>
+				<input value="150" id="weight"></input>
+				<label>Slacker Weight</label>
+			</div>
+		</div>
+		<div id="tension">
+			Tension: <span id="tensionValue"></span>
+		</div>
+	</section>
   <script src="js/script.js"></script>
 </body>
 </html>
