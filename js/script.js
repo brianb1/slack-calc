@@ -17,9 +17,11 @@ function updateTension() {
 	const length = parseFloat($("#length").value) || 0
 	const sag = parseFloat($("#sag").value) || 0
 	const weight = parseFloat($("#weight").value) || 0
-	$("#tensionValue").innerHTML = Math.ceil(weight
+  const lbf = Math.ceil(weight
 		* Math.sqrt(Math.pow(length / 2, 2) + Math.pow(sag, 2))
     / (2 * sag))
+  const kn = lbf * 0.004448221615
+	$("#tensionValue").innerHTML = `${lbf} lbf (${kn.toFixed(2)} kn)`
 }
 
 // Make the input scrubbable
