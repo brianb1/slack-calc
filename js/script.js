@@ -7,6 +7,8 @@ const $ = selector => document.querySelector(selector)
 // Setup the canvas
 const canvas = $("#canvas")
 const ctx = canvas.getContext("2d")
+
+// Make the canvas the same size as the page
 onresize = () => {
   canvas.width = innerWidth
 	canvas.height = 2 * innerHeight / 3
@@ -31,7 +33,7 @@ let scrubPosition = 0
 let scrubStartValue = 0
 Array.from(document.querySelectorAll("input")).forEach(input => {
 	input.oninput = updateTension
-	input.onmousedown = e => {
+  input.onmousedown = e => {
 		scrubbing = e.target
 		scrubPosition = e.clientX
 		scrubStartValue = parseFloat(input.value)
